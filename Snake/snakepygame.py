@@ -5,7 +5,7 @@ import pygame
 # Basic configs
 WIDTH, HEIGHT = 600, 600
 BLOCK_SIZE = 20
-FPS = 15
+FPS = 8
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -27,6 +27,80 @@ def random_food_position(snake):
         if [x, y] not in snake:
             return [x, y]
         
+def draw_grid(screen):
+    for x in range(0, WIDTH, BLOCK_SIZE):
+        pygame.draw.line(screen, GRAY, (x, 0), (x, HEIGHT))
+    for y in range(0, HEIGHT, BLOCK_SIZE):
+        pygame.draw.line(screen, GRAY, (0, y), (WIDTH, y))
+        
+def start_screen(screen, title_font, info_font, clock):
+    while True:
+        screen.fill(BLACK)
+        draw_text(screen, "SNAKE GAME", title_font, GREEN, WIDTH // 2 - 120, HEIGHT // 2 - 100)
+        draw_text(screen, "Press SPACE to start", info_font, WHITE, WIDTH // 2 - 115, HEIGHT // 2 - 20)
+        draw_text(screen, "Press Q to quit", info_font, WHITE, WIDTH // 2 - 80, HEIGHT // 2 + 20)
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    sys.exit()
+
+        clock.tick(10)
+
+
+def pause_screen(screen, title_font, info_font, clock):
+    paused = True
+    while paused:
+        draw_text(screen, "PAUSED", title_font, YELLOW, WIDTH // 2 - 70, HEIGHT // 2 - 60)
+        draw_text(screen, "Press P to continue", info_font, WHITE, WIDTH // 2 - 110, HEIGHT // 2)
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    paused = False
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    sys.exit()
+
+        clock.tick(10)
+
+
+def game_over_screen(screen, title_font, info_font, clock, score, high_score):
+    while True:
+        screen.fill(BLACK)
+        draw_text(screen, "GAME OVER", title_font, RED, WIDTH // 2 - 110, HEIGHT // 2 - 100)
+        draw_text(screen, f"Score: {score}", info_font, WHITE, WIDTH // 2 - 55, HEIGHT // 2 - 30)
+        draw_text(screen, f"High Score: {high_score}", info_font, WHITE, WIDTH // 2 - 80, HEIGHT // 2 + 5)
+        draw_text(screen, "Press R to restart", info_font, WHITE, WIDTH // 2 - 95, HEIGHT // 2 + 45)
+        draw_text(screen, "Press Q to quit", info_font, WHITE, WIDTH // 2 - 75, HEIGHT // 2 + 80)
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    return
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    sys.exit()
+
+        clock.tick(10)
+                
 # Main game
 def main():
     pygame.init()
@@ -34,9 +108,13 @@ def main():
     pygame.display.set_caption("Snake Game")
     clock = pygame.time.Clock()
     
+    title_font = pygame.font.SysFont("arial", 40, bold=True)
     score_font = pygame.font.SysFont("arial", 28)
-    game_over_font = pygame.font.SysFont("arial", 36, bold = True)
     info_font = pygame.font.SysFont("arial", 24)
+    
+    high_score = 0
+    
+    start_screen(screen, title_font, info_font, clock)
     
     while True:
         # Reset game
@@ -107,12 +185,7 @@ def main():
                 
             # Drawing
             screen.fill(BLACK)
-            
-            # Grid
-            for x in range(0, WIDTH, BLOCK_SIZE):
-                pygame.draw.line(screen, GRAY, (x, 0), (x, HEIGHT))
-            for y in range(0, HEIGHT, BLOCK_SIZE):
-                pygame.draw.line(screen, GRAY, (0, y), (WIDTH, y))
+            draw_grid(screen)
                 
             # Food
             pygame.draw.rect(screen, RED, (food[0], food[1], BLOCK_SIZE, BLOCK_SIZE))
@@ -124,32 +197,13 @@ def main():
                 
             # Score
             draw_text(screen, f"Score: {score}", score_font, WHITE, 10, 10)
+            draw_text(screen, f"High Score: {high_score}", score_font, WHITE, 10, 40)
+            draw_text(screen, "P = Pause", score_font, WHITE, 10, 70)
             
             pygame.display.flip()
             clock.tick(FPS)
-            
-        # Game over screen
-        waiting = True
-        while waiting:
-            screen.fill(BLACK)
-            draw_text(screen, "GAME OVER", game_over_font, RED, WIDTH // 2 - 120, HEIGHT // 2 - 80)
-            draw_text(screen, f"Final Score: {score}", info_font, WHITE, WIDTH // 2 - 80, HEIGHT // 2 - 20)
-            draw_text(screen, "Press R for restart", info_font, WHITE, WIDTH // 2 - 105, HEIGHT // 2 + 20)
-            draw_text(screen, "Press Q or close window to exit", info_font, WHITE, WIDTH // 2 - 165, HEIGHT // 2 + 55)
-            pygame.display.flip()
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:
-                        waiting = False
-                    elif event.key == pygame.K_q:
-                        pygame.quit()
-                        sys.exit()
-                        
-            clock.tick(10)
+
+        game_over_screen(screen, title_font, info_font, clock, score, high_score)
             
             
 if __name__ == "__main__":
