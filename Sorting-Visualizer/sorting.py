@@ -2,9 +2,7 @@ import random
 import sys
 import pygame
 
-# -----------------------------
-# Konfigurasi dasar
-# -----------------------------
+# Basic configs
 WIDTH, HEIGHT = 1000, 600
 TOP_MARGIN = 80
 SIDE_MARGIN = 40
@@ -13,7 +11,6 @@ MIN_VALUE = 10
 MAX_VALUE = 500
 FPS = 60
 
-# Warna
 BACKGROUND = (18, 18, 18)
 BAR_COLOR = (220, 220, 220)
 ACTIVE_COLOR = (255, 170, 0)
@@ -255,7 +252,6 @@ def main():
                     sorting_algorithm = insertion_sort
                     sorting_name = "Insertion Sort"
 
-        # ---- Run sorting step ----
         if sorting and sorting_generator is not None:
             try:
                 comparisons, swaps = next(sorting_generator)
